@@ -1,0 +1,10 @@
+{
+  "appId": "com.kaios.simulator",
+  "appName": "KaiOS Simulator",
+  "webDir": "www",
+  "server": {
+    "hostname": "kaios-app",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  }
+}

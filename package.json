@@ -1,11 +1,11 @@
 {
   "name": "kaios-simulator",
   "version": "1.0.0",
-  "displayName": "KaiOS Simulator",
   "dependencies": {
-    "cordova-android": "^12.0.0"
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
   },
   "devDependencies": {
-    "cordova": "^12.0.0"
+    "@capacitor/cli": "^6.0.0"
   }
 }

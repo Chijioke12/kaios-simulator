@@ -1,37 +1,46 @@
-name: Build Cordova Android
+name: Build KaiOS Simulator
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install Cordova
-        run: npm install -g cordova
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install @capacitor/android @capacitor/assets
 
-      # We switch to Java 11 here to fix the XmlParser error
       - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '11'
+          distribution: 'zulu'
+          java-version: '17'
 
-      - name: Build APK
+      - name: Generate Icons and Build APK
         run: |
-          # Add the platform
-          cordova platform add android
+          # 1. Prepare Icon
+          mkdir -p assets
+          cp www/icon.png assets/icon-only.png
+          cp www/icon.png assets/icon-foreground.png
+          cp www/icon.png assets/icon-background.png
+
+          # 2. Initialize Android
+          npx cap add android
           
-          # This command helps fix some common Gradle issues
-          cd platforms/android && ./gradlew clean && cd ../..
+          # 3. Force Generate Android Icons
+          npx @capacitor/assets generate --android
           
-          # Build the final APK
-          cordova build android --debug
+          # 4. Sync and Build
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: KaiOS-Cordova-Fixed-APK
-          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          name: KaiOS-Sim-Final
+          path: android/app/build/outputs/apk/debug/app-debug.apk
