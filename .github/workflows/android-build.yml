@@ -1,30 +1,31 @@
-name: Build Android
+name: Build Cordova Android
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Dependencies
-        run: |
-          npm install
-          npm install @capacitor/android
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
+
       - name: Build APK
         run: |
-          npx cap add android
-          npx cap sync android
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          # Cordova expects files in 'www'
+          cordova platform add android
+          cordova build android --debug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: KaiOS-Simulator-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: KaiOS-Cordova-APK
+          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
