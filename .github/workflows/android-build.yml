@@ -19,21 +19,25 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Generate Icons and Build APK
+      - name: Build and Fix Security
         run: |
-          # 1. Prepare Icon
+          # 1. Prepare Assets
           mkdir -p assets
           cp www/icon.png assets/icon-only.png
           cp www/icon.png assets/icon-foreground.png
           cp www/icon.png assets/icon-background.png
 
-          # 2. Initialize Android
+          # 2. Add Android
           npx cap add android
           
-          # 3. Force Generate Android Icons
+          # 3. GENERATE ICONS
           npx @capacitor/assets generate --android
           
-          # 4. Sync and Build
+          # 4. SECURITY FIX (The "White Screen" Fix)
+          # This line forces the Android WebView to allow Mixed Content
+          sed -i 's/this.bridge.getWebView().getSettings().setJavaScriptEnabled(true);/this.bridge.getWebView().getSettings().setJavaScriptEnabled(true);\nthis.bridge.getWebView().getSettings().setMixedContentMode(0);/' android/app/src/main/java/com/getcapacitor/BridgeActivity.java
+
+          # 5. Build APK
           npx cap sync android
           cd android
           chmod +x gradlew
@@ -42,5 +46,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: KaiOS-Sim-Final
+          name: KaiOS-Simulator-Fixed
           path: android/app/build/outputs/apk/debug/app-debug.apk
