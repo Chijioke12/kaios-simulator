@@ -3,6 +3,7 @@
   "appName": "KaiOS Simulator",
   "webDir": "www",
   "server": {
+    "androidScheme": "http",
     "hostname": "kaios-app",
     "cleartext": true,
     "allowNavigation": ["*"]
