@@ -8,24 +8,30 @@ jobs:
       
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Install Cordova
         run: npm install -g cordova
 
+      # We switch to Java 11 here to fix the XmlParser error
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: 'temurin'
+          java-version: '11'
 
       - name: Build APK
         run: |
-          # Cordova expects files in 'www'
+          # Add the platform
           cordova platform add android
+          
+          # This command helps fix some common Gradle issues
+          cd platforms/android && ./gradlew clean && cd ../..
+          
+          # Build the final APK
           cordova build android --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: KaiOS-Cordova-APK
+          name: KaiOS-Cordova-Fixed-APK
           path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
